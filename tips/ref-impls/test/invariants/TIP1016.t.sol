@@ -3,11 +3,11 @@ pragma solidity >=0.8.13 <0.9.0;
 
 import { Test } from "forge-std/Test.sol";
 
-import { ITIP20 } from "../../src/interfaces/ITIP20.sol";
 import { InvariantBase } from "../helpers/InvariantBase.sol";
 import { GasLeftChecker, TIP1016Storage } from "../helpers/TIP1016Helpers.sol";
 import { Counter, InitcodeHelper, SimpleStorage } from "../helpers/TestContracts.sol";
 import { TxBuilder } from "../helpers/TxBuilder.sol";
+import { ITIP20 } from "tempo-std/interfaces/ITIP20.sol";
 
 import { VmExecuteTransaction, VmRlp } from "tempo-std/StdVm.sol";
 import { LegacyTransaction, LegacyTransactionLib } from "tempo-std/tx/LegacyTransactionLib.sol";
@@ -26,8 +26,8 @@ import { LegacyTransaction, LegacyTransactionLib } from "tempo-std/tx/LegacyTran
 /// - RES1-RES3: Reservoir model (GAS opcode, conservation, overflow)
 /// - BLK1-BLK3: Block accounting (gasUsed, receipts, mixed workload)
 /// - REF1-REF2: Refund semantics (SSTORE restoration, refund cap)
-/// forge-config: tempo.hardfork = "tempo:T4"
-/// forge-config: tempo_ci.hardfork = "tempo:T4"
+/// forge-config: default.hardfork = "tempo:T4"
+/// forge-config: fuzz500.hardfork = "tempo:T4"
 contract TIP1016InvariantTest is InvariantBase {
 
     using TxBuilder for *;
@@ -246,8 +246,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param slotSeed Seed for generating unique slot
     function handler_sstoreNewSlot(uint256 actorSeed, uint256 slotSeed) external {
-        if (!isTempo) return;
-
         ghost_gas1Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -288,8 +286,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param slotSeed Seed for generating unique slot
     function handler_sstoreExistingSlot(uint256 actorSeed, uint256 slotSeed) external {
-        if (!isTempo) return;
-
         ghost_gas2Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -345,8 +341,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param sizeSeed Seed for contract size (1k-8k range for manageable gas)
     function handler_createContract(uint256 actorSeed, uint256 sizeSeed) external {
-        if (!isTempo) return;
-
         ghost_gas3Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -399,8 +393,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @notice Handler: GAS opcode returns gas_left only (TIP1016-RES1)
     /// @param actorSeed Seed for selecting actor
     function handler_gasleftCheck(uint256 actorSeed) external {
-        if (!isTempo) return;
-
         ghost_res1Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -440,8 +432,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param extraGas Extra gas above the limit
     function handler_stateGasOverflow(uint256 actorSeed, uint256 extraGas) external {
-        if (!isTempo) return;
-
         ghost_res3Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -483,8 +473,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param slotSeed Seed for slot generation
     function handler_mixedWorkload(uint256 actorSeed, uint256 slotSeed) external {
-        if (!isTempo) return;
-
         ghost_blk3Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;
@@ -545,8 +533,6 @@ contract TIP1016InvariantTest is InvariantBase {
     /// @param actorSeed Seed for selecting actor
     /// @param valueSeed Seed for the intermediate value
     function handler_sstoreSetAndClear(uint256 actorSeed, uint256 valueSeed) external {
-        if (!isTempo) return;
-
         ghost_ref1Tests++;
 
         uint256 senderIdx = actorSeed % actors.length;

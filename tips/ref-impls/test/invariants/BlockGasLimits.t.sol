@@ -3,9 +3,9 @@ pragma solidity >=0.8.13 <0.9.0;
 
 import { Test } from "forge-std/Test.sol";
 
-import { ITIP20 } from "../../src/interfaces/ITIP20.sol";
 import { InvariantBase } from "../helpers/InvariantBase.sol";
 import { TxBuilder } from "../helpers/TxBuilder.sol";
+import { ITIP20 } from "tempo-std/interfaces/ITIP20.sol";
 
 import { VmExecuteTransaction, VmRlp } from "tempo-std/StdVm.sol";
 import { LegacyTransaction, LegacyTransactionLib } from "tempo-std/tx/LegacyTransactionLib.sol";
@@ -32,8 +32,8 @@ import { LegacyTransaction, LegacyTransactionLib } from "tempo-std/tx/LegacyTran
 ///
 /// Block-level lane enforcement (BLOCK7, BLOCK12) and shared gas limit
 /// (BLOCK10) are tested in Rust (crates/consensus/src/lib.rs).
-/// forge-config: tempo.hardfork = "tempo:T4"
-/// forge-config: tempo_ci.hardfork = "tempo:T4"
+/// forge-config: default.hardfork = "tempo:T4"
+/// forge-config: fuzz500.hardfork = "tempo:T4"
 contract BlockGasLimitsInvariantTest is InvariantBase {
 
     using TxBuilder for *;
@@ -190,7 +190,6 @@ contract BlockGasLimitsInvariantTest is InvariantBase {
     /// @param stateGasExtra Extra state gas above the cap (1 to 1M)
     function handler_txGasCapEnforcement(uint256 actorSeed, uint256 stateGasExtra) external {
         // Skip when not on Tempo (vmExec.executeTransaction not available)
-        if (!isTempo) return;
 
         ghost_txGasCapTests++;
 
@@ -245,7 +244,6 @@ contract BlockGasLimitsInvariantTest is InvariantBase {
     /// @param sizeFraction Fraction of max size to deploy (50-100%)
     function handler_maxDeploymentFits(uint256 actorSeed, uint256 sizeFraction) external {
         // Skip when not on Tempo (vmExec.executeTransaction not available)
-        if (!isTempo) return;
 
         ghost_deploymentTests++;
 
